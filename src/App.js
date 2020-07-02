@@ -12,14 +12,14 @@ import axios from 'axios';
 // WebSocket ===================================================
 function ServiceURLtoGame(roomName) {
     var host = 'carlostictactoeback.herokuapp.com';
-    var url = 'ws://' + (host) + '/room/' + roomName;
+    var url = 'wss://' + (host) + '/room/' + roomName;
     console.log("URL Calculada Con game: " + url);
     return url;
 }
 
 function ServiceURL(roomName) {
     var host = 'carlostictactoeback.herokuapp.com';
-    var url = 'ws://' + (host) + '/tictactoe/' + roomName;
+    var url = 'wss://' + (host) + '/tictactoe/' + roomName;
     console.log("URL Calculada: " + url);
     return url;
 }
