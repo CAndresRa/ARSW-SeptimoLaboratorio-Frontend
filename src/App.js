@@ -11,6 +11,7 @@ import axios from 'axios';
 
 // WebSocket ===================================================
 function ServiceURLtoGame(roomName) {
+    //carlostictactoeback.herokuapp.com
     var host = 'carlostictactoeback.herokuapp.com';
     var url = 'wss://' + (host) + '/room/' + roomName;
     console.log("URL Calculada Con game: " + url);
@@ -18,6 +19,7 @@ function ServiceURLtoGame(roomName) {
 }
 
 function ServiceURL(roomName) {
+    //carlostictactoeback.herokuapp.com
     var host = 'carlostictactoeback.herokuapp.com';
     var url = 'wss://' + (host) + '/tictactoe/' + roomName;
     console.log("URL Calculada: " + url);
@@ -50,6 +52,9 @@ class WebSocketChannel {
         console.error("In onError", evt);
     }
 
+    onClose(evt){
+      alert('connection closed');};
+
   send(i) {
     let msg = i;
     console.log("sending: ", msg);
@@ -74,7 +79,6 @@ class MainPage extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     console.log("click");
-    this.comunicationWS = new WebSocketChannel(ServiceURL(this.state.roomName));
     const { history } = this.props;
     history.push('/room/' + this.state.roomName);
   }
@@ -133,7 +137,7 @@ class Board extends React.Component {
       squares: Array(9).fill(null),
       xIsNext: true,
     };
-
+    this.backMove = this.backMove.bind(this);
     this.comunicationWS =
     new WebSocketChannel(ServiceURLtoGame(window.location.pathname.split("/")[2]),
         (msg) => {
@@ -159,9 +163,18 @@ class Board extends React.Component {
     console.log(this.state)
   }
 
+  backMove(event){
+    event.preventDefault();
+      this.comunicationWS.send("back");
+
+  }
+
   update(i){
     this.setState(i);
   }
+
+
+
 
   renderSquare(i) {
     return <Square value={this.state.squares[i]}
@@ -196,7 +209,11 @@ class Board extends React.Component {
           {this.renderSquare(7)}
           {this.renderSquare(8)}
         </div>
+        <Form onSubmit={this.backMove}>
+          <Button type="submit" className="btn-lg btn-dark btn-block"> Regresar Movimiento </Button>
+        </Form>
       </div>
+
     );
   }
 }
