@@ -138,6 +138,7 @@ class Board extends React.Component {
       xIsNext: true,
     };
     this.backMove = this.backMove.bind(this);
+    this.saveRoom = this.saveRoom.bind(this);
     this.comunicationWS =
     new WebSocketChannel(ServiceURLtoGame(window.location.pathname.split("/")[2]),
         (msg) => {
@@ -165,16 +166,21 @@ class Board extends React.Component {
 
   backMove(event){
     event.preventDefault();
-      this.comunicationWS.send("back");
+    this.comunicationWS.send("back");
+  }
 
+  saveRoom(event){
+    event.preventDefault();
+    var name = window.location.pathname.split("/")[2];
+    var stateToSave = JSON.stringify(this.state);
+    var arrayToSend = [name, stateToSave];
+    console.log(typeof(arrayToSend));
+    axios.post('http://localhost:8080/create', arrayToSend);
   }
 
   update(i){
     this.setState(i);
   }
-
-
-
 
   renderSquare(i) {
     return <Square value={this.state.squares[i]}
@@ -211,6 +217,9 @@ class Board extends React.Component {
         </div>
         <Form onSubmit={this.backMove}>
           <Button type="submit" className="btn-lg btn-dark btn-block"> Regresar Movimiento </Button>
+        </Form>
+        <Form onSubmit={this.saveRoom}>
+          <Button type="submit" className="btn-lg btn-dark btn-block"> Guardar </Button>
         </Form>
       </div>
 
