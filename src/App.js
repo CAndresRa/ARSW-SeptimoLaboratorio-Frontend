@@ -12,16 +12,16 @@ import axios from 'axios';
 // WebSocket ===================================================
 function ServiceURLtoGame(roomName) {
     //carlostictactoeback.herokuapp.com
-    var host = 'localhost:8080';
-    var url = 'ws://' + (host) + '/room/' + roomName;
+    var host = 'carlostictactoeback.herokuapp.com';
+    var url = 'wss://' + (host) + '/room/' + roomName;
     console.log("URL Calculada Con game: " + url);
     return url;
 }
 
 function ServiceURL(roomName) {
     //carlostictactoeback.herokuapp.com
-    var host = 'localhost:8080';
-    var url = 'ws://' + (host) + '/tictactoe/' + roomName;
+    var host = 'carlostictactoeback.herokuapp.com';
+    var url = 'wss://' + (host) + '/tictactoe/' + roomName;
     console.log("URL Calculada: " + url);
     return url;
 }
@@ -139,6 +139,7 @@ class Board extends React.Component {
     };
     this.backMove = this.backMove.bind(this);
     this.saveRoom = this.saveRoom.bind(this);
+    this.rememberRoom = this.rememberRoom.bind(this);
     this.comunicationWS =
     new WebSocketChannel(ServiceURLtoGame(window.location.pathname.split("/")[2]),
         (msg) => {
@@ -175,7 +176,22 @@ class Board extends React.Component {
     var stateToSave = JSON.stringify(this.state);
     var arrayToSend = [name, stateToSave];
     console.log(typeof(arrayToSend));
-    axios.post('http://localhost:8080/create', arrayToSend);
+    axios.post('https://carlostictactoeback.herokuapp.com/create', arrayToSend);
+  }
+
+  rememberRoom(event){
+    event.preventDefault();
+    var x = window.location.pathname.split("/")[2];
+    var saveStateRoom = axios.get('https://carlostictactoeback.herokuapp.com/obtainstatesave?name=' + x)
+    .then(saveStateRoom => {
+      this.setState(
+        saveStateRoom.data,
+        () => {
+        this.comunicationWS.send(JSON.stringify(this.state));
+      });
+        console.log(saveStateRoom);
+        //this.update(saveStateRoom.data);
+    });
   }
 
   update(i){
@@ -220,6 +236,9 @@ class Board extends React.Component {
         </Form>
         <Form onSubmit={this.saveRoom}>
           <Button type="submit" className="btn-lg btn-dark btn-block"> Guardar </Button>
+        </Form>
+        <Form onSubmit={this.rememberRoom}>
+          <Button type="submit" className="btn-lg btn-dark btn-block"> Cargar Juego Anterior </Button>
         </Form>
       </div>
 
